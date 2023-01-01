@@ -1,6 +1,6 @@
 FROM debian:buster
 
-MAINTAINER danielpmc, <dan@danbot.host>
+LABEL maintainers="danielpmc, <dan@danbot.host>, tweak4141, <tweak@talosbot.xyz>"
 
 RUN apt update \
     && apt upgrade -y \
