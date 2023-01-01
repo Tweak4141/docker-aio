@@ -42,8 +42,9 @@ RUN apt update \
    && cd Python-3.10.9 && ./configure --enable-optimizations \
    && make -j $(nproc) \
    && make altinstall \
+   && cd .. \
    && rm -rf Python-3.10.9 \
-   && rm ../Python-3.10.*.tgz 
+   && rm Python-3.10.*.tgz 
    
 # Upgrade Pip
 RUN apt -y install python python-pip python3-pip \
