@@ -52,6 +52,7 @@ RUN apt -y install python python-pip python3-pip \
 
 # Golang
 RUN curl -LO https://get.golang.org/$(uname)/go_installer \
+   && export SHELL=/bin/bash \
    && chmod +x go_installer \
    && ./go_installer \
    && rm go_installer 
