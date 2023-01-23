@@ -4,7 +4,7 @@ LABEL maintainers="danielpmc, <dan@danbot.host>, tweak4141, <tweak@talosbot.xyz>
 
 RUN apt update \
     && apt upgrade -y \
-    && apt -y install curl software-properties-common locales git \
+    && apt -y install curl software-properties-common locales git libc6-dev \
     && apt-get install -y default-jre \
     && apt-get -y install liblzma-dev \
     && apt-get -y install lzma \
@@ -54,10 +54,31 @@ RUN apt -y install python python-pip python3-pip \
 RUN curl -OL https://golang.org/dl/go1.19.4.linux-amd64.tar.gz \
    && tar -C /usr/local -xvf go1.19.4.linux-amd64.tar.gz 
    
-ENV PATH=$PATH:/usr/local/go/bin
-ENV GOROOT=/usr/local/go
-   
-
+ENV PATH=$PATH:/usr/local/go/bin \
+    GOROOT=/usr/local/go
+# Rust Language Setup   
+ENV RUSTUP_HOME=/usr/local/rustup \
+    CARGO_HOME=/usr/local/cargo \
+    PATH=/usr/local/cargo/bin:$PATH \
+    RUST_VERSION=1.66.1
+    
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends ca-certificates gcc libc6-dev ; \
+    dpkgArch="$(dpkg --print-architecture)"; \
+    rustArch='x86_64-unknown-linux-gnu'; \
+    rustupSha256='5cc9ffd1026e82e7fb2eec2121ad71f4b0f044e88bca39207b3f6b769aaa799c'; \
+    url="https://static.rust-lang.org/rustup/archive/1.25.1/${rustArch}/rustup-init"; \
+    wget "$url"; \
+    echo "${rustupSha256} *rustup-init" | sha256sum -c -; \
+    chmod +x rustup-init; \
+    ./rustup-init -y --no-modify-path --profile minimal --default-toolchain $RUST_VERSION --default-host ${rustArch}; \
+    rm rustup-init; \
+    chmod -R a+w $RUSTUP_HOME $CARGO_HOME; \
+    rustup --version; \
+    cargo --version; \
+    rustc --version
+    
 #.NET Core Runtime and SDK
 RUN wget https://packages.microsoft.com/config/debian/10/packages-microsoft-prod.deb -O packages-microsoft-prod.deb \
    && dpkg -i packages-microsoft-prod.deb \ 
