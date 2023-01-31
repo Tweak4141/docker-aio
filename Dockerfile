@@ -34,6 +34,26 @@ RUN apt update \
 ENV JAVA_HOME=/usr/lib/jvm/jdk-17/
 ENV PATH=$PATH:$JAVA_HOME/bin
 
+# Rust
+ENV RUSTUP_HOME=/usr/local/rustup \
+    CARGO_HOME=/usr/local/cargo \
+    PATH=/usr/local/cargo/bin:$PATH \
+    RUST_VERSION=1.67.0
+
+RUN set -eux; \
+    rustArch='x86_64-unknown-linux-gnu'; \
+    rustupSha256='5cc9ffd1026e82e7fb2eec2121ad71f4b0f044e88bca39207b3f6b769aaa799c'; \
+    url="https://static.rust-lang.org/rustup/archive/1.25.1/${rustArch}/rustup-init"; \
+    wget "$url"; \
+    echo "${rustupSha256} *rustup-init" | sha256sum -c -; \
+    chmod +x rustup-init; \
+    ./rustup-init -y --no-modify-path --profile minimal --default-toolchain $RUST_VERSION --default-host ${rustArch}; \
+    rm rustup-init; \
+    chmod -R a+w $RUSTUP_HOME $CARGO_HOME; \
+    rustup --version; \
+    cargo --version; \
+    rustc --version;
+    
 # NodeJS
 RUN curl -sL https://deb.nodesource.com/setup_lts.x | bash - \
     && apt -y install nodejs \
